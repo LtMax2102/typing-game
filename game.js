@@ -1,3 +1,10 @@
+// TODO
+// add a way to get closest word rather than just the next one in the list
+
+
+
+
+
 console.log("Connected");
 
 
@@ -6,10 +13,11 @@ let canvas = document.createElement("canvas")
 let ctx = canvas.getContext('2d');
 
 canvas.style.background = 'black'
+canvas.style.border = "10px solid white";
 canvas.width = '1000';
 canvas.height = '450';
 
-// document.querySelector('body').appendChild(canvas);
+document.querySelector('body').appendChild(canvas);
 
 
 const key_down_handler = (e) => {
@@ -30,7 +38,7 @@ const start_game = () => {
 	started = true;
 }
 
-document.querySelector('button').addEventListener("click", start_game);
+// document.querySelector('button').addEventListener("click", start_game);
 
 let kp; // key pressed
 let word_list = ["cats", "dogs", "lights", "men"];
@@ -39,6 +47,7 @@ let scroll_speed = 2;
 let cur_word;
 let focus = 0;
 let started = false;
+let finished = false;
 
 
 class word {
@@ -65,16 +74,16 @@ class word {
 			this.x_pos = p;
 		}
 		else {
-			this.x_pos = -50;
+			this.x_pos = -200;
 			this.y_pos = Math.random() * (canvas.height - 30) + 30;
 			this.dead = false;
 			this.cor_char = 0;
 		}
 
-
-
-		
-		
+		if (this.x_pos > 1000) {
+			finished = true;
+			started = false;
+		}
 	}
 
 	handle_input(key) {
@@ -86,7 +95,7 @@ class word {
 			if (this.characters[0] == key) this.cor_char++;	
 		} 
 		else {
-			console.log("COR", this.characters[this.cor_char])
+			console.log("CORRECT", this.characters[this.cor_char])
 			if (this.characters[this.cor_char] == key) this.cor_char++;
 		}
 	}
@@ -97,17 +106,27 @@ let words = []
 
 const main_menu = () => {
 
-	words.push(new word("Start", 499, 200));
+	words.push(new word("start", 499, 200));
 
-	words.foreac
+	words[0].draw();
+
+	if (words[0].x_pos < 499) { 
+		started = true;
+		words_beat = 0;
+		focus = 0;
+		words = [];
+		for (let i = 0; i < word_list.length; i++) { words.push(new word(word_list[i], -100 - (i * 100), (Math.random() * (canvas.height - 30) + 30 ))) }
+	}
 }
 
 
+const loss_menu = () => {
+	ctx.font = '20px Arial';
+	ctx.fillStyle = "white";
+	ctx.fillText("You have lost", 450, 200);
 
-
-for (let i = 0; i < word_list.length; i++) { words.push(new word(word_list[i], -50, (Math.random() * (canvas.height - 30) + 30 ))) }
-
-cur_word = words[focus].characters;
+	ctx.fillText("Words Typed: " + words_beat, 450, 230);
+}
 
 let p = 0;
 
@@ -123,6 +142,12 @@ const draw = () => {
 			words[i].draw();
 			words[i].x_pos += scroll_speed;
 		}
+	}
+	else if (!started && finished) {
+		loss_menu();
+	}
+	else {
+		main_menu();
 	}
 
 	if (kp) {
@@ -145,7 +170,7 @@ const draw = () => {
 	requestAnimationFrame(draw)
 }
 
-// main_menu();
+draw();
 
 // for (let x of words) {
 // 	x.draw();
