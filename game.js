@@ -41,7 +41,7 @@ const start_game = () => {
 // document.querySelector('button').addEventListener("click", start_game);
 
 let kp; // key pressed
-let word_list = ["cats", "dogs", "lights", "men"];
+let word_list = ["cats", "dogs", "lights", "men", 'walk', 'bark', 'mark', 'bark'];
 let words_beat = 0;
 let scroll_speed = 2;
 let cur_word;
@@ -78,6 +78,7 @@ class word {
 			this.y_pos = Math.random() * (canvas.height - 30) + 30;
 			this.dead = false;
 			this.cor_char = 0;
+			get_next();
 		}
 
 		if (this.x_pos > 1000) {
@@ -99,6 +100,22 @@ class word {
 			if (this.characters[this.cor_char] == key) this.cor_char++;
 		}
 	}
+}
+
+
+const get_next = () => {
+	let next = {id: 0, x_pos: 0};
+	let holder;
+
+	for (let i = 0; i < words.length; i++) {
+		if (words[i].x_pos > next.x_pos) {
+			next.id = i;
+			next.x_pos = words[i].x_pos;
+			holder = words[i].characters;
+		}
+	}
+	focus = next.id;
+	console.log(holder);
 }
 
 
@@ -126,9 +143,22 @@ const loss_menu = () => {
 	ctx.fillText("You have lost", 450, 200);
 
 	ctx.fillText("Words Typed: " + words_beat, 450, 230);
-}
 
-let p = 0;
+	// if (words.length > 1) {
+	// 	words = [];
+	// 	focus = 0;
+
+	// }
+
+	// words = [];
+	// focus = 0;
+
+	// words.push(new word("retry", 490, 290));
+	// words[0].draw();
+
+
+
+}
 
 const draw = () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -151,16 +181,13 @@ const draw = () => {
 	}
 
 	if (kp) {
+		console.log(words[focus]);
 		words[focus].handle_input(kp);
 
 		if (kp == ' ') {
 			if (words[focus].cor_char == words[focus].characters.length) {
 				words[focus].dead = true;
 				words_beat++;
-				focus++;
-
-				// just for now
-				if (focus == words.length) focus = 0;
 			}
 		}
 
@@ -171,7 +198,3 @@ const draw = () => {
 }
 
 draw();
-
-// for (let x of words) {
-// 	x.draw();
-// 
